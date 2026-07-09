@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: Arial, sans-serif; max-width: 480px; margin: 40px auto; }
+      label { display: block; margin-top: 12px; font-weight: bold; }
+      input { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; }
+      button { margin-top: 20px; padding: 10px 20px; background: #f59e0b; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+      #status { margin-top: 16px; }
+      .hint { font-weight: normal; font-size: 12px; color: #6b7280; margin-top: 2px; }
+      .note { background: #f3f4f6; padding: 10px; border-radius: 4px; font-size: 13px; margin-top: 16px; }
+    </style>
+  </head>
+  <body>
+    <h2>Set up your email signature</h2>
+    <p>This sets your official Gmail signature.</p>
+    <div class="note">
+      You can choose how your name appears: your full name, just a nickname, or both combined
+      (e.g. <em>Alex "Nick" Smith</em>). Leave First/Last Name blank to show only your nickname,
+      or leave Nickname blank to show only your full name.
+    </div>
+
+    <label>First name</label>
+    <input id="firstName" type="text">
+
+    <label>Last name</label>
+    <input id="lastName" type="text">
+
+    <label>Nickname <span class="hint">(optional, shown in quotes between your names, or alone if names are left blank)</span></label>
+    <input id="nickname" type="text">
+
+    <label>Job title</label>
+    <input id="title" type="text">
+
+    <button onclick="submit()">Set my signature</button>
+    <div id="status"></div>
+
+    <script>
+      google.script.run.withSuccessHandler(function(profile) {
+        document.getElementById('firstName').value = profile.firstName || '';
+        document.getElementById('lastName').value = profile.lastName || '';
+        document.getElementById('title').value = profile.jobTitle || '';
+      }).getMyProfile();
+
+      function submit() {
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const nickname = document.getElementById('nickname').value;
+        const title = document.getElementById('title').value;
+        document.getElementById('status').innerText = 'Saving...';
+        google.script.run.withSuccessHandler(function(msg) {
+          document.getElementById('status').innerText = msg;
+        }).withFailureHandler(function(err) {
+          document.getElementById('status').innerText = 'Error: ' + err.message;
+        }).setSignature(firstName, lastName, nickname, title);
+      }
+    </script>
+  </body>
+</html>
